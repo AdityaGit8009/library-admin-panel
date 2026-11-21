@@ -6,6 +6,7 @@ import { useLibraryCollection } from "@/hooks/use-library"
 import { RecordDetails } from "@/components/admin/record-details"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
 import { nextRecordId } from "@/lib/record-id"
+import { memberEmailInUse } from "@/lib/library/email"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -343,7 +344,10 @@ export function MembersManagement() {
             className="grid gap-4 py-4"
             onSubmit={(event) => {
               event.preventDefault()
-              handleAddMember()
+              const emailInput = event.currentTarget.elements.namedItem("email") as HTMLInputElement
+              const inUse = memberEmailInUse(newMember.email, members)
+              emailInput.setCustomValidity(inUse ? "A member already uses this email address." : "")
+              if (emailInput.reportValidity()) handleAddMember()
             }}
           >
             <div className="grid gap-2">
@@ -361,10 +365,14 @@ export function MembersManagement() {
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
+                name="email"
                 required
                 type="email"
                 value={newMember.email}
-                onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
+                onChange={(e) => {
+                  e.currentTarget.setCustomValidity("")
+                  setNewMember({ ...newMember, email: e.target.value })
+                }}
                 className="bg-input border-border"
               />
             </div>
@@ -419,7 +427,10 @@ export function MembersManagement() {
               className="grid gap-4 py-4"
               onSubmit={(event) => {
                 event.preventDefault()
-                handleEditMember()
+                const emailInput = event.currentTarget.elements.namedItem("email") as HTMLInputElement
+                const inUse = memberEmailInUse(editingMember.email, members, editingMember.id)
+                emailInput.setCustomValidity(inUse ? "A member already uses this email address." : "")
+                if (emailInput.reportValidity()) handleEditMember()
               }}
             >
               <div className="grid gap-2">
@@ -437,10 +448,14 @@ export function MembersManagement() {
                 <Label htmlFor="edit-email">Email</Label>
                 <Input
                   id="edit-email"
+                  name="email"
                   required
                   type="email"
                   value={editingMember.email}
-                  onChange={(e) => setEditingMember({ ...editingMember, email: e.target.value })}
+                  onChange={(e) => {
+                    e.currentTarget.setCustomValidity("")
+                    setEditingMember({ ...editingMember, email: e.target.value })
+                  }}
                   className="bg-input border-border"
                 />
               </div>
