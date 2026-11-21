@@ -202,6 +202,8 @@ export function LoansManagement() {
   const { rows: paginatedLoans, pagination } = useTablePagination(filteredLoans)
 
   const handleAddLoan = () => {
+    if (!newLoan.member || !newLoan.book || !newLoan.dueDate) return
+
     const loan: Omit<Loan, "id"> = {
       member: {
         name: newLoan.member,
@@ -454,14 +456,23 @@ export function LoansManagement() {
           <DialogHeader>
             <DialogTitle className="text-foreground">Create New Loan</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <form
+            id="add-loan"
+            className="grid gap-4 py-4"
+            onSubmit={(event) => {
+              event.preventDefault()
+              handleAddLoan()
+            }}
+          >
             <div className="grid gap-2">
               <Label htmlFor="loan-member">Member</Label>
               <Select
+                name="member"
+                required
                 value={newLoan.member}
                 onValueChange={(value) => setNewLoan({ ...newLoan, member: value })}
               >
-                <SelectTrigger className="bg-input border-border">
+                <SelectTrigger id="loan-member" className="bg-input border-border">
                   <SelectValue placeholder="Select member" />
                 </SelectTrigger>
                 <SelectContent>
@@ -476,10 +487,12 @@ export function LoansManagement() {
             <div className="grid gap-2">
               <Label htmlFor="loan-book">Book</Label>
               <Select
+                name="book"
+                required
                 value={newLoan.book}
                 onValueChange={(value) => setNewLoan({ ...newLoan, book: value })}
               >
-                <SelectTrigger className="bg-input border-border">
+                <SelectTrigger id="loan-book" className="bg-input border-border">
                   <SelectValue placeholder="Select book" />
                 </SelectTrigger>
                 <SelectContent>
@@ -496,17 +509,18 @@ export function LoansManagement() {
               <Input
                 id="due-date"
                 type="date"
+                required
                 value={newLoan.dueDate}
                 onChange={(e) => setNewLoan({ ...newLoan, dueDate: e.target.value })}
                 className="bg-input border-border"
               />
             </div>
-          </div>
+          </form>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleAddLoan} className="bg-primary hover:bg-primary/90">
+            <Button type="submit" form="add-loan" className="bg-primary hover:bg-primary/90">
               Create Loan
             </Button>
           </DialogFooter>
