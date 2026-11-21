@@ -1,13 +1,6 @@
-export interface Book {
-  id: number
-  title: string
-  author: string
-  isbn: string
-  category: string
-  status: "available" | "borrowed" | "reserved"
-  copies: number
-  publishedYear: number
-}
+import type { Book } from "./session"
+
+export type { Book } from "./session"
 
 export const initialBooks: Book[] = [
   {

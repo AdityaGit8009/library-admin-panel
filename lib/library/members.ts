@@ -1,14 +1,6 @@
-export interface Member {
-  id: number
-  name: string
-  email: string
-  phone: string
-  avatar: string
-  membershipType: "standard" | "premium" | "student"
-  joinDate: string
-  booksLoaned: number
-  status: "active" | "inactive" | "suspended"
-}
+import type { Member } from "./session"
+
+export type { Member } from "./session"
 
 export const initialMembers: Member[] = [
   {

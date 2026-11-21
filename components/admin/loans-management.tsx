@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { initialLoans, type Loan } from "@/lib/library/loans"
+import type { Loan } from "@/lib/library/loans"
+import { useLibraryCollection } from "@/hooks/use-library"
 import { RecordDetails } from "@/components/admin/record-details"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
 import { nextRecordId } from "@/lib/record-id"
@@ -59,7 +60,7 @@ const availableMembers = [
 ]
 
 export function LoansManagement() {
-  const [loans, setLoans] = useState<Loan[]>(initialLoans)
+  const [loans, setLoans] = useLibraryCollection("loans")
   const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")

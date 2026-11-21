@@ -1,20 +1,6 @@
-export interface Loan {
-  id: number
-  member: {
-    name: string
-    avatar: string
-    email: string
-  }
-  book: {
-    title: string
-    author: string
-    isbn: string
-  }
-  loanDate: string
-  dueDate: string
-  returnDate: string | null
-  status: "active" | "returned" | "overdue"
-}
+import type { Loan } from "./session"
+
+export type { Loan } from "./session"
 
 export const initialLoans: Loan[] = [
   {

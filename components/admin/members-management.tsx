@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { initialMembers, type Member } from "@/lib/library/members"
+import type { Member } from "@/lib/library/members"
+import { useLibraryCollection } from "@/hooks/use-library"
 import { RecordDetails } from "@/components/admin/record-details"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
 import { nextRecordId } from "@/lib/record-id"
@@ -44,7 +45,7 @@ import {
 } from "@/components/ui/select"
 
 export function MembersManagement() {
-  const [members, setMembers] = useState<Member[]>(initialMembers)
+  const [members, setMembers] = useLibraryCollection("members")
   const [selectedMember, setSelectedMember] = useState<Member | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")

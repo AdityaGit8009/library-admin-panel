@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { initialBooks, type Book } from "@/lib/library/books"
+import type { Book } from "@/lib/library/books"
+import { useLibraryCollection } from "@/hooks/use-library"
 import { RecordDetails } from "@/components/admin/record-details"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
 import { nextRecordId } from "@/lib/record-id"
@@ -42,7 +43,7 @@ import {
 } from "@/components/ui/select"
 
 export function BooksManagement() {
-  const [books, setBooks] = useState<Book[]>(initialBooks)
+  const [books, setBooks] = useLibraryCollection("books")
   const [selectedBook, setSelectedBook] = useState<Book | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
