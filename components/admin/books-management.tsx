@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,8 +15,6 @@ import {
   Trash2,
   Eye,
   BookOpen,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -140,8 +139,6 @@ export function BooksManagement() {
   const [statusFilter, setStatusFilter] = useState("all")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [editingBook, setEditingBook] = useState<Book | null>(null)
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 5
 
   const [newBook, setNewBook] = useState({
     title: "",
@@ -162,11 +159,7 @@ export function BooksManagement() {
     return matchesSearch && matchesCategory && matchesStatus
   })
 
-  const totalPages = Math.ceil(filteredBooks.length / itemsPerPage)
-  const paginatedBooks = filteredBooks.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  )
+  const { rows: paginatedBooks, pagination } = useTablePagination(filteredBooks)
 
   const handleAddBook = () => {
     const book: Book = {
@@ -343,34 +336,7 @@ export function BooksManagement() {
             </table>
           </div>
 
-          {/* Pagination */}
-          <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
-            <p className="text-sm text-muted-foreground">
-              Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-              {Math.min(currentPage * itemsPerPage, filteredBooks.length)} of {filteredBooks.length} books
-            </p>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="text-sm text-foreground">
-                Page {currentPage} of {totalPages}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+          <TablePagination {...pagination} itemLabel="books" />
         </CardContent>
       </Card>
 
