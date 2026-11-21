@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { useLibraryRecords } from "@/hooks/use-library"
 import { isOutstanding, loanStatus } from "@/lib/library/circulation"
 import { localDate } from "@/lib/library/calendar"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { MemberAvatar } from "@/components/admin/member-avatar"
 import {
   BookOpen,
   Users,
@@ -35,55 +35,17 @@ const loanActivityData = [
   { name: "Jul", loans: 350, returns: 310 },
 ]
 
-const recentLoans = [
-  {
-    id: 1,
-    member: "Sarah Johnson",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face",
-    book: "The Great Gatsby",
-    date: "Mar 24, 2026",
-    status: "active",
-  },
-  {
-    id: 2,
-    member: "Michael Chen",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-    book: "1984",
-    date: "Mar 23, 2026",
-    status: "active",
-  },
-  {
-    id: 3,
-    member: "Emily Davis",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
-    book: "To Kill a Mockingbird",
-    date: "Mar 22, 2026",
-    status: "overdue",
-  },
-  {
-    id: 4,
-    member: "James Wilson",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
-    book: "Pride and Prejudice",
-    date: "Mar 21, 2026",
-    status: "active",
-  },
-]
-
-const overdueBooks = [
-  { id: 1, book: "The Catcher in the Rye", member: "Alex Brown", days: 5 },
-  { id: 2, book: "Brave New World", member: "Lisa Smith", days: 3 },
-  { id: 3, book: "The Hobbit", member: "Tom Harris", days: 7 },
-]
-
-export function Dashboard() {
+export function Dashboard({ onViewLoans }: { onViewLoans: () => void }) {
   const { books, members, loans } = useLibraryRecords()
   const today = localDate()
+  const recentLoans = [...loans].sort((a, b) => b.loanDate.localeCompare(a.loanDate) || b.id - a.id).slice(0, 4)
+  const overdue = loans.filter((loan) => loanStatus(loan, today) === "overdue")
+  const overdueBooks = [...overdue].sort((a, b) => a.dueDate.localeCompare(b.dueDate)).slice(0, 3)
   const statsCards = [
     { title: "Catalog titles", value: books.length, icon: BookOpen, color: "text-chart-1", bgColor: "bg-chart-1/10" },
     { title: "Active members", value: members.filter((member) => member.status === "active").length, icon: Users, color: "text-chart-2", bgColor: "bg-chart-2/10" },
     { title: "Books on loan", value: loans.filter(isOutstanding).length, icon: BookMarked, color: "text-chart-3", bgColor: "bg-chart-3/10" },
-    { title: "Overdue loans", value: loans.filter((loan) => loanStatus(loan, today) === "overdue").length, icon: AlertCircle, color: "text-chart-4", bgColor: "bg-chart-4/10" },
+    { title: "Overdue loans", value: overdue.length, icon: AlertCircle, color: "text-chart-4", bgColor: "bg-chart-4/10" },
   ]
   const categories = new Map<string, number>()
   for (const book of books) categories.set(book.category, (categories.get(book.category) ?? 0) + 1)
@@ -214,38 +176,29 @@ export function Dashboard() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-foreground">Recent Loans</CardTitle>
-              <button className="text-sm text-primary hover:underline">View all</button>
+              <button onClick={onViewLoans} className="text-sm text-primary hover:underline">View all loans</button>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              {recentLoans.length === 0 && <p className="text-sm text-muted-foreground">No checkouts yet.</p>}
               {recentLoans.map((loan) => (
                 <div
                   key={loan.id}
                   className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={loan.avatar} alt={loan.member} />
-                      <AvatarFallback>{loan.member[0]}</AvatarFallback>
-                    </Avatar>
+                    <MemberAvatar name={loan.member.name} src={loan.member.avatar} />
                     <div>
-                      <p className="font-medium text-foreground">{loan.member}</p>
-                      <p className="text-sm text-muted-foreground">{loan.book}</p>
+                      <p className="font-medium text-foreground">{loan.member.name}</p>
+                      <p className="text-sm text-muted-foreground">{loan.book.title}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <Badge
-                      variant={loan.status === "active" ? "default" : "destructive"}
-                      className={
-                        loan.status === "active"
-                          ? "bg-[oklch(0.65_0.15_145)] text-[oklch(0.12_0.01_260)]"
-                          : ""
-                      }
-                    >
-                      {loan.status}
+                    <Badge variant={loanStatus(loan, today) === "overdue" ? "destructive" : "secondary"}>
+                      {loanStatus(loan, today)}
                     </Badge>
-                    <p className="text-xs text-muted-foreground mt-1">{loan.date}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{loan.loanDate}</p>
                   </div>
                 </div>
               ))}
@@ -263,15 +216,16 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              {overdueBooks.length === 0 && <p className="text-sm text-muted-foreground">No overdue loans.</p>}
               {overdueBooks.map((item) => (
                 <div
                   key={item.id}
                   className="p-3 rounded-lg bg-destructive/10 border border-destructive/20"
                 >
-                  <p className="font-medium text-foreground">{item.book}</p>
-                  <p className="text-sm text-muted-foreground">{item.member}</p>
+                  <p className="font-medium text-foreground">{item.book.title}</p>
+                  <p className="text-sm text-muted-foreground">{item.member.name}</p>
                   <Badge variant="destructive" className="mt-2">
-                    {item.days} days overdue
+                    Due {item.dueDate}
                   </Badge>
                 </div>
               ))}

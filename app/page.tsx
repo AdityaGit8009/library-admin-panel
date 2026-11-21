@@ -28,7 +28,7 @@ export default function AdminPanel() {
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
-        return <Dashboard />
+        return <Dashboard onViewLoans={() => setActiveTab("loans")} />
       case "books":
         return <BooksManagement />
       case "members":
@@ -40,7 +40,7 @@ export default function AdminPanel() {
       case "settings":
         return <Settings />
       default:
-        return <Dashboard />
+        return <Dashboard onViewLoans={() => setActiveTab("loans")} />
     }
   }
 
