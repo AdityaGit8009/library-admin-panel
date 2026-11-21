@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
+import { nextRecordId } from "@/lib/record-id"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -146,15 +147,14 @@ export function MembersManagement() {
   const { rows: paginatedMembers, pagination } = useTablePagination(filteredMembers)
 
   const handleAddMember = () => {
-    const member: Member = {
-      id: members.length + 1,
+    const member: Omit<Member, "id"> = {
       ...newMember,
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${newMember.name}`,
       joinDate: new Date().toISOString().split("T")[0],
       booksLoaned: 0,
       status: "active",
     }
-    setMembers([...members, member])
+    setMembers((current) => [...current, { ...member, id: nextRecordId(current) }])
     setIsAddDialogOpen(false)
     setNewMember({ name: "", email: "", phone: "", membershipType: "standard" })
   }

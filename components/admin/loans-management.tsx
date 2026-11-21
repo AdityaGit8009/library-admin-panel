@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
+import { nextRecordId } from "@/lib/record-id"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -201,8 +202,7 @@ export function LoansManagement() {
   const { rows: paginatedLoans, pagination } = useTablePagination(filteredLoans)
 
   const handleAddLoan = () => {
-    const loan: Loan = {
-      id: loans.length + 1,
+    const loan: Omit<Loan, "id"> = {
       member: {
         name: newLoan.member,
         avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${newLoan.member}`,
@@ -218,7 +218,7 @@ export function LoansManagement() {
       returnDate: null,
       status: "active",
     }
-    setLoans([loan, ...loans])
+    setLoans((current) => [{ ...loan, id: nextRecordId(current) }, ...current])
     setIsAddDialogOpen(false)
     setNewLoan({ member: "", book: "", dueDate: "" })
   }

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
+import { nextRecordId } from "@/lib/record-id"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -162,12 +163,11 @@ export function BooksManagement() {
   const { rows: paginatedBooks, pagination } = useTablePagination(filteredBooks)
 
   const handleAddBook = () => {
-    const book: Book = {
-      id: books.length + 1,
+    const book: Omit<Book, "id"> = {
       ...newBook,
       status: "available",
     }
-    setBooks([...books, book])
+    setBooks((current) => [...current, { ...book, id: nextRecordId(current) }])
     setIsAddDialogOpen(false)
     setNewBook({
       title: "",
