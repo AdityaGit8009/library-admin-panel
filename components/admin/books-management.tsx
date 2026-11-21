@@ -6,6 +6,7 @@ import { useLibraryCollection } from "@/hooks/use-library"
 import { RecordDetails } from "@/components/admin/record-details"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
 import { nextRecordId } from "@/lib/record-id"
+import { isbnProblem, normalizeIsbn } from "@/lib/library/isbn"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -60,11 +61,12 @@ export function BooksManagement() {
     publishedYear: new Date().getFullYear(),
   })
 
+  const isbnSearch = normalizeIsbn(searchTerm)
   const filteredBooks = books.filter((book) => {
     const matchesSearch =
       book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      book.isbn.includes(searchTerm)
+      (isbnSearch !== "" && normalizeIsbn(book.isbn).includes(isbnSearch))
     const matchesCategory = categoryFilter === "all" || book.category === categoryFilter
     const matchesStatus = statusFilter === "all" || book.status === statusFilter
     return matchesSearch && matchesCategory && matchesStatus
@@ -276,7 +278,9 @@ export function BooksManagement() {
             className="grid gap-4 py-4"
             onSubmit={(event) => {
               event.preventDefault()
-              handleAddBook()
+              const isbnInput = event.currentTarget.elements.namedItem("isbn") as HTMLInputElement
+              isbnInput.setCustomValidity(isbnProblem(newBook.isbn, books))
+              if (isbnInput.reportValidity()) handleAddBook()
             }}
           >
             <div className="grid gap-2">
@@ -306,10 +310,14 @@ export function BooksManagement() {
                 <Label htmlFor="isbn">ISBN</Label>
                 <Input
                   id="isbn"
+                  name="isbn"
                   required
                   pattern={".*\\S.*"}
                   value={newBook.isbn}
-                  onChange={(e) => setNewBook({ ...newBook, isbn: e.target.value })}
+                  onChange={(e) => {
+                    e.currentTarget.setCustomValidity("")
+                    setNewBook({ ...newBook, isbn: e.target.value })
+                  }}
                   className="bg-input border-border"
                 />
               </div>
