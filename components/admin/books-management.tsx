@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import type { Book } from "@/lib/library/books"
-import { useLibraryCollection } from "@/hooks/use-library"
+import { useLibraryCollection, useLibraryRecords } from "@/hooks/use-library"
+import { availableCopies } from "@/lib/library/circulation"
 import { RecordDetails } from "@/components/admin/record-details"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
 import { nextRecordId } from "@/lib/record-id"
@@ -45,6 +46,7 @@ import {
 
 export function BooksManagement() {
   const [books, setBooks] = useLibraryCollection("books")
+  const { loans } = useLibraryRecords()
   const [selectedBook, setSelectedBook] = useState<Book | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
@@ -195,7 +197,7 @@ export function BooksManagement() {
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">ISBN</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Category</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Copies</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Available / total</th>
                   <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Actions</th>
                 </tr>
               </thead>
@@ -219,7 +221,7 @@ export function BooksManagement() {
                     <td className="py-3 px-4">
                       <Badge className={getStatusColor(book.status)}>{book.status}</Badge>
                     </td>
-                    <td className="py-3 px-4 text-foreground">{book.copies}</td>
+                    <td className="py-3 px-4 text-foreground">{availableCopies(book, loans)} / {book.copies}</td>
                     <td className="py-3 px-4 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

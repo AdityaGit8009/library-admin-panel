@@ -7,6 +7,7 @@ import { RecordDetails } from "@/components/admin/record-details"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
 import { nextRecordId } from "@/lib/record-id"
 import { localDate } from "@/lib/library/calendar"
+import { availableCopies } from "@/lib/library/circulation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -47,6 +48,7 @@ import {
 export function LoansManagement() {
   const [loans, setLoans] = useLibraryCollection("loans")
   const { members, books } = useLibraryRecords()
+  const availableBooks = books.filter((book) => book.status !== "reserved" && availableCopies(book, loans) > 0)
   const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -70,7 +72,7 @@ export function LoansManagement() {
 
   const handleAddLoan = () => {
     const member = members.find((item) => item.id === Number(newLoan.memberId))
-    const book = books.find((item) => item.id === Number(newLoan.bookId))
+    const book = availableBooks.find((item) => item.id === Number(newLoan.bookId))
     const issued = localDate()
     if (!member || !book || !newLoan.dueDate || newLoan.dueDate < issued) return
 
@@ -373,7 +375,7 @@ export function LoansManagement() {
                   <SelectValue placeholder="Select book" />
                 </SelectTrigger>
                 <SelectContent>
-                  {books.map((book) => (
+                  {availableBooks.map((book) => (
                     <SelectItem key={book.id} value={String(book.id)}>
                       {book.title}
                     </SelectItem>
