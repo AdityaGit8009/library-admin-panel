@@ -1,6 +1,8 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { useLibraryRecords } from "@/hooks/use-library"
+import { isOutstanding } from "@/lib/library/circulation"
 import {
   LayoutDashboard,
   BookOpen,
@@ -30,6 +32,9 @@ const menuItems = [
 ]
 
 export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
+  const { loans } = useLibraryRecords()
+  const outstanding = loans.filter(isOutstanding).length
+
   return (
     <aside className="h-full w-full bg-sidebar border-r border-sidebar-border flex flex-col">
       {/* Logo */}
@@ -66,8 +71,8 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
               <Icon className="h-5 w-5" />
               {item.label}
               {item.id === "loans" && (
-                <Badge variant="secondary" className="ml-auto bg-primary/20 text-primary text-xs">
-                  12
+                <Badge variant="secondary" aria-label={`${outstanding} outstanding loans`} className="ml-auto bg-primary/20 text-primary text-xs">
+                  {outstanding}
                 </Badge>
               )}
             </button>
