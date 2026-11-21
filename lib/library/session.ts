@@ -12,7 +12,8 @@ const member = z.object({
   booksLoaned: z.number().int().nonnegative(), status: z.enum(["active", "inactive", "suspended"]),
 })
 const loan = z.object({
-  id, member: member.pick({ name: true, email: true, avatar: true }),
+  id, memberId: id.optional(), bookId: id.optional(),
+  member: member.pick({ name: true, email: true, avatar: true }),
   book: book.pick({ title: true, author: true, isbn: true }),
   loanDate: z.string(), dueDate: z.string(), returnDate: z.string().nullable(),
   status: z.enum(["active", "returned", "overdue"]),

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import type { Loan } from "@/lib/library/loans"
-import { useLibraryCollection } from "@/hooks/use-library"
+import { useLibraryCollection, useLibraryRecords } from "@/hooks/use-library"
 import { RecordDetails } from "@/components/admin/record-details"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
 import { nextRecordId } from "@/lib/record-id"
@@ -43,32 +43,17 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-const availableBooks = [
-  "The Hobbit",
-  "The Art of War",
-  "The Origin of Species",
-  "Crime and Punishment",
-  "War and Peace",
-]
-
-const availableMembers = [
-  "Sarah Johnson",
-  "Michael Chen",
-  "Emily Davis",
-  "James Wilson",
-  "Lisa Anderson",
-]
-
 export function LoansManagement() {
   const [loans, setLoans] = useLibraryCollection("loans")
+  const { members, books } = useLibraryRecords()
   const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
 
   const [newLoan, setNewLoan] = useState({
-    member: "",
-    book: "",
+    memberId: "",
+    bookId: "",
     dueDate: "",
   })
 
@@ -83,19 +68,15 @@ export function LoansManagement() {
   const { rows: paginatedLoans, pagination } = useTablePagination(filteredLoans)
 
   const handleAddLoan = () => {
-    if (!newLoan.member || !newLoan.book || !newLoan.dueDate) return
+    const member = members.find((item) => item.id === Number(newLoan.memberId))
+    const book = books.find((item) => item.id === Number(newLoan.bookId))
+    if (!member || !book || !newLoan.dueDate) return
 
     const loan: Omit<Loan, "id"> = {
-      member: {
-        name: newLoan.member,
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${newLoan.member}`,
-        email: `${newLoan.member.toLowerCase().replace(" ", ".")}@email.com`,
-      },
-      book: {
-        title: newLoan.book,
-        author: "Unknown Author",
-        isbn: "978-0000000000",
-      },
+      memberId: member.id,
+      bookId: book.id,
+      member: { name: member.name, email: member.email, avatar: member.avatar },
+      book: { title: book.title, author: book.author, isbn: book.isbn },
       loanDate: new Date().toISOString().split("T")[0],
       dueDate: newLoan.dueDate,
       returnDate: null,
@@ -103,7 +84,7 @@ export function LoansManagement() {
     }
     setLoans((current) => [{ ...loan, id: nextRecordId(current) }, ...current])
     setIsAddDialogOpen(false)
-    setNewLoan({ member: "", book: "", dueDate: "" })
+    setNewLoan({ memberId: "", bookId: "", dueDate: "" })
   }
 
   const handleReturnBook = (loanId: number) => {
@@ -363,16 +344,16 @@ export function LoansManagement() {
               <Select
                 name="member"
                 required
-                value={newLoan.member}
-                onValueChange={(value) => setNewLoan({ ...newLoan, member: value })}
+                value={newLoan.memberId}
+                onValueChange={(value) => setNewLoan({ ...newLoan, memberId: value })}
               >
                 <SelectTrigger id="loan-member" className="bg-input border-border">
                   <SelectValue placeholder="Select member" />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableMembers.map((member) => (
-                    <SelectItem key={member} value={member}>
-                      {member}
+                  {members.map((member) => (
+                    <SelectItem key={member.id} value={String(member.id)}>
+                      {member.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -383,16 +364,16 @@ export function LoansManagement() {
               <Select
                 name="book"
                 required
-                value={newLoan.book}
-                onValueChange={(value) => setNewLoan({ ...newLoan, book: value })}
+                value={newLoan.bookId}
+                onValueChange={(value) => setNewLoan({ ...newLoan, bookId: value })}
               >
                 <SelectTrigger id="loan-book" className="bg-input border-border">
                   <SelectValue placeholder="Select book" />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableBooks.map((book) => (
-                    <SelectItem key={book} value={book}>
-                      {book}
+                  {books.map((book) => (
+                    <SelectItem key={book.id} value={String(book.id)}>
+                      {book.title}
                     </SelectItem>
                   ))}
                 </SelectContent>
