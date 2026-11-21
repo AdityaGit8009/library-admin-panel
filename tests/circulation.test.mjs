@@ -21,6 +21,7 @@ test("member balances follow current and legacy outstanding loans", () => {
 
 test("a due date remains current through the day and returned loans stay closed", () => {
   const loan = { ...open, dueDate: "2026-10-20" }
+  assert.equal(loanStatus({ ...loan, status: "overdue" }, ""), "overdue")
   assert.equal(loanStatus(loan, "2026-10-20"), "active")
   assert.equal(loanStatus(loan, "2026-10-21"), "overdue")
   assert.equal(loanStatus({ ...loan, returnDate: "2026-10-19" }, "2026-10-21"), "returned")

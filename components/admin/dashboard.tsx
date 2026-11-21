@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useLibraryRecords } from "@/hooks/use-library"
 import { isOutstanding, loanStatus } from "@/lib/library/circulation"
-import { localDate } from "@/lib/library/calendar"
+import { useLibraryDate } from "@/hooks/use-library-date"
 import { MemberAvatar } from "@/components/admin/member-avatar"
 import {
   BookOpen,
@@ -37,7 +37,7 @@ const loanActivityData = [
 
 export function Dashboard({ onViewLoans }: { onViewLoans: () => void }) {
   const { books, members, loans } = useLibraryRecords()
-  const today = localDate()
+  const today = useLibraryDate()
   const recentLoans = [...loans].sort((a, b) => b.loanDate.localeCompare(a.loanDate) || b.id - a.id).slice(0, 4)
   const overdue = loans.filter((loan) => loanStatus(loan, today) === "overdue")
   const overdueBooks = [...overdue].sort((a, b) => a.dueDate.localeCompare(b.dueDate)).slice(0, 3)

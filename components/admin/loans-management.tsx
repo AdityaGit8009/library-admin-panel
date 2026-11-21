@@ -7,6 +7,7 @@ import { RecordDetails } from "@/components/admin/record-details"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
 import { nextRecordId } from "@/lib/record-id"
 import { localDate } from "@/lib/library/calendar"
+import { useLibraryDate } from "@/hooks/use-library-date"
 import { availableCopies, loanStatus, returnLoan } from "@/lib/library/circulation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -47,7 +48,7 @@ import {
 
 export function LoansManagement() {
   const [storedLoans, setLoans] = useLibraryCollection("loans")
-  const today = localDate()
+  const today = useLibraryDate()
   const loans = storedLoans.map((loan) => ({ ...loan, status: loanStatus(loan, today) }))
   const { members, books } = useLibraryRecords()
   const borrowingMembers = members.filter((member) => member.status === "active")
@@ -382,7 +383,7 @@ export function LoansManagement() {
               <Input
                 id="due-date"
                 type="date"
-                min={localDate()}
+                min={today || undefined}
                 required
                 value={newLoan.dueDate}
                 onChange={(e) => setNewLoan({ ...newLoan, dueDate: e.target.value })}

@@ -23,6 +23,7 @@ export function memberLoans(member: Member, loans: readonly Loan[]) {
 
 export function loanStatus(loan: Loan, today: string): Loan["status"] {
   if (!isOutstanding(loan)) return "returned"
+  if (!today) return loan.status
   return loan.dueDate && loan.dueDate < today ? "overdue" : "active"
 }
 
