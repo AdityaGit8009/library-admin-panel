@@ -96,7 +96,7 @@ export function MembersManagement() {
   }
 
   const handleDeleteMember = (id: number) => {
-    setMembers(members.filter((m) => m.id !== id))
+    setMembers((current) => current.filter((member) => member.id !== id || memberLoans(member, loans) > 0))
   }
 
   const getStatusColor = (status: string) => {
@@ -305,10 +305,11 @@ export function MembersManagement() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="text-destructive"
+                            disabled={memberLoans(member, loans) > 0}
                             onClick={() => handleDeleteMember(member.id)}
                           >
                             <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
+                            {memberLoans(member, loans) > 0 ? "Return outstanding loans before deleting" : "Delete"}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

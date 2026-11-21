@@ -106,7 +106,7 @@ export function BooksManagement() {
   }
 
   const handleDeleteBook = (id: number) => {
-    setBooks(books.filter((b) => b.id !== id))
+    setBooks((current) => current.filter((book) => book.id !== id || borrowedCopies(book, loans) > 0))
   }
 
   const getStatusColor = (status: string) => {
@@ -241,10 +241,11 @@ export function BooksManagement() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="text-destructive"
+                            disabled={borrowedCopies(book, loans) > 0}
                             onClick={() => handleDeleteBook(book.id)}
                           >
                             <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
+                            {borrowedCopies(book, loans) > 0 ? "Return outstanding loans before deleting" : "Delete"}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
