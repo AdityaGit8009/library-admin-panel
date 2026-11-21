@@ -4,20 +4,15 @@ import { useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Pagination } from "@/components/ui/pagination"
-
-const pageSize = 5
+import { getTablePage } from "@/lib/table-page"
 
 export function useTablePagination<T>(items: T[]) {
   const [requestedPage, setPage] = useState(1)
-  const total = items.length
-  const pageCount = Math.ceil(total / pageSize)
-  const page = Math.min(requestedPage, Math.max(1, pageCount))
-  const offset = (page - 1) * pageSize
-  const end = Math.min(offset + pageSize, total)
+  const { rows, ...range } = getTablePage(items, requestedPage)
 
   return {
-    rows: items.slice(offset, end),
-    pagination: { page, pageCount, start: offset + 1, end, total, onPageChange: setPage },
+    rows,
+    pagination: { ...range, onPageChange: setPage },
   }
 }
 
