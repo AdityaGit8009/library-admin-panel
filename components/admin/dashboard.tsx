@@ -2,14 +2,14 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { useLibraryRecords } from "@/hooks/use-library"
+import { isOutstanding, loanStatus } from "@/lib/library/circulation"
+import { localDate } from "@/lib/library/calendar"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   BookOpen,
   Users,
   BookMarked,
-  TrendingUp,
-  ArrowUpRight,
-  ArrowDownRight,
   Clock,
   AlertCircle,
 } from "lucide-react"
@@ -25,45 +25,6 @@ import {
   Bar,
 } from "recharts"
 
-const statsCards = [
-  {
-    title: "Total Books",
-    value: "12,847",
-    change: "+2.5%",
-    trend: "up",
-    icon: BookOpen,
-    color: "text-chart-1",
-    bgColor: "bg-chart-1/10",
-  },
-  {
-    title: "Active Members",
-    value: "3,426",
-    change: "+12.3%",
-    trend: "up",
-    icon: Users,
-    color: "text-chart-2",
-    bgColor: "bg-chart-2/10",
-  },
-  {
-    title: "Books on Loan",
-    value: "1,234",
-    change: "-3.1%",
-    trend: "down",
-    icon: BookMarked,
-    color: "text-chart-3",
-    bgColor: "bg-chart-3/10",
-  },
-  {
-    title: "Monthly Growth",
-    value: "23.5%",
-    change: "+5.2%",
-    trend: "up",
-    icon: TrendingUp,
-    color: "text-chart-4",
-    bgColor: "bg-chart-4/10",
-  },
-]
-
 const loanActivityData = [
   { name: "Jan", loans: 120, returns: 100 },
   { name: "Feb", loans: 150, returns: 130 },
@@ -72,14 +33,6 @@ const loanActivityData = [
   { name: "May", loans: 280, returns: 250 },
   { name: "Jun", loans: 320, returns: 290 },
   { name: "Jul", loans: 350, returns: 310 },
-]
-
-const categoryData = [
-  { name: "Fiction", value: 3200 },
-  { name: "Non-Fiction", value: 2800 },
-  { name: "Science", value: 2100 },
-  { name: "History", value: 1800 },
-  { name: "Arts", value: 1500 },
 ]
 
 const recentLoans = [
@@ -124,6 +77,18 @@ const overdueBooks = [
 ]
 
 export function Dashboard() {
+  const { books, members, loans } = useLibraryRecords()
+  const today = localDate()
+  const statsCards = [
+    { title: "Catalog titles", value: books.length, icon: BookOpen, color: "text-chart-1", bgColor: "bg-chart-1/10" },
+    { title: "Active members", value: members.filter((member) => member.status === "active").length, icon: Users, color: "text-chart-2", bgColor: "bg-chart-2/10" },
+    { title: "Books on loan", value: loans.filter(isOutstanding).length, icon: BookMarked, color: "text-chart-3", bgColor: "bg-chart-3/10" },
+    { title: "Overdue loans", value: loans.filter((loan) => loanStatus(loan, today) === "overdue").length, icon: AlertCircle, color: "text-chart-4", bgColor: "bg-chart-4/10" },
+  ]
+  const categories = new Map<string, number>()
+  for (const book of books) categories.set(book.category, (categories.get(book.category) ?? 0) + 1)
+  const categoryData = Array.from(categories, ([name, value]) => ({ name, value }))
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -149,21 +114,6 @@ export function Dashboard() {
                   <div className={`p-2 rounded-lg ${stat.bgColor}`}>
                     <Icon className={`h-5 w-5 ${stat.color}`} />
                   </div>
-                  <Badge
-                    variant="outline"
-                    className={
-                      stat.trend === "up"
-                        ? "text-[oklch(0.65_0.15_145)] border-[oklch(0.65_0.15_145)]"
-                        : "text-destructive border-destructive"
-                    }
-                  >
-                    {stat.trend === "up" ? (
-                      <ArrowUpRight className="h-3 w-3 mr-1" />
-                    ) : (
-                      <ArrowDownRight className="h-3 w-3 mr-1" />
-                    )}
-                    {stat.change}
-                  </Badge>
                 </div>
                 <div className="mt-4">
                   <p className="text-2xl font-bold text-foreground">{stat.value}</p>
@@ -181,7 +131,7 @@ export function Dashboard() {
         <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-foreground">Loan Activity</CardTitle>
+              <CardTitle className="text-foreground">Sample Loan Activity</CardTitle>
               <div className="flex items-center gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-chart-1" />
@@ -232,7 +182,7 @@ export function Dashboard() {
         {/* Category Distribution */}
         <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-foreground">Books by Category</CardTitle>
+            <CardTitle className="text-foreground">Titles by Category</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[280px]">
