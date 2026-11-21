@@ -5,6 +5,7 @@ export type { Loan } from "./session"
 export const initialLoans: Loan[] = [
   {
     id: 1,
+    memberId: 1,
     member: {
       name: "Sarah Johnson",
       avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face",
@@ -22,6 +23,7 @@ export const initialLoans: Loan[] = [
   },
   {
     id: 2,
+    memberId: 2,
     member: {
       name: "Michael Chen",
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
@@ -39,6 +41,7 @@ export const initialLoans: Loan[] = [
   },
   {
     id: 3,
+    memberId: 3,
     member: {
       name: "Emily Davis",
       avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
@@ -56,6 +59,7 @@ export const initialLoans: Loan[] = [
   },
   {
     id: 4,
+    memberId: 4,
     member: {
       name: "James Wilson",
       avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
@@ -73,6 +77,7 @@ export const initialLoans: Loan[] = [
   },
   {
     id: 5,
+    memberId: 5,
     member: {
       name: "Lisa Anderson",
       avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face",
@@ -90,6 +95,7 @@ export const initialLoans: Loan[] = [
   },
   {
     id: 6,
+    memberId: 6,
     member: {
       name: "David Brown",
       avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face",

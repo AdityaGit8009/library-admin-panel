@@ -9,7 +9,7 @@ const book = z.object({
 const member = z.object({
   id, name: z.string(), email: z.string(), phone: z.string(), avatar: z.string(),
   membershipType: z.enum(["standard", "premium", "student"]), joinDate: z.string(),
-  booksLoaned: z.number().int().nonnegative(), status: z.enum(["active", "inactive", "suspended"]),
+  status: z.enum(["active", "inactive", "suspended"]),
 })
 const loan = z.object({
   id, memberId: id.optional(), bookId: id.optional(),

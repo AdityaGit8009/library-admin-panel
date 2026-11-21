@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import type { Member } from "@/lib/library/members"
-import { useLibraryCollection } from "@/hooks/use-library"
+import { useLibraryCollection, useLibraryRecords } from "@/hooks/use-library"
+import { memberLoans } from "@/lib/library/circulation"
 import { RecordDetails } from "@/components/admin/record-details"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
 import { nextRecordId } from "@/lib/record-id"
@@ -48,6 +49,7 @@ import {
 
 export function MembersManagement() {
   const [members, setMembers] = useLibraryCollection("members")
+  const { loans } = useLibraryRecords()
   const [selectedMember, setSelectedMember] = useState<Member | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -78,7 +80,6 @@ export function MembersManagement() {
       email: newMember.email.trim(),
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${newMember.name}`,
       joinDate: localDate(),
-      booksLoaned: 0,
       status: "active",
     }
     setMembers((current) => [...current, { ...member, id: nextRecordId(current) }])
@@ -285,7 +286,7 @@ export function MembersManagement() {
                     <td className="py-3 px-4">
                       <Badge className={getStatusColor(member.status)}>{member.status}</Badge>
                     </td>
-                    <td className="py-3 px-4 text-foreground">{member.booksLoaned}</td>
+                    <td className="py-3 px-4 text-foreground">{memberLoans(member, loans)}</td>
                     <td className="py-3 px-4 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -328,7 +329,7 @@ export function MembersManagement() {
           fields={{
               Email: selectedMember.email, Phone: selectedMember.phone || "Unlisted",
               Membership: selectedMember.membershipType, Status: selectedMember.status,
-              Joined: selectedMember.joinDate, "Books on loan": selectedMember.booksLoaned,
+              Joined: selectedMember.joinDate, "Books on loan": memberLoans(selectedMember, loans),
           }}
           onClose={() => setSelectedMember(null)}
         />

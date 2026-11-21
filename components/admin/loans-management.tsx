@@ -48,6 +48,7 @@ import {
 export function LoansManagement() {
   const [loans, setLoans] = useLibraryCollection("loans")
   const { members, books } = useLibraryRecords()
+  const borrowingMembers = members.filter((member) => member.status === "active")
   const availableBooks = books.filter((book) => book.status !== "reserved" && availableCopies(book, loans) > 0)
   const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
@@ -71,7 +72,7 @@ export function LoansManagement() {
   const { rows: paginatedLoans, pagination } = useTablePagination(filteredLoans)
 
   const handleAddLoan = () => {
-    const member = members.find((item) => item.id === Number(newLoan.memberId))
+    const member = borrowingMembers.find((item) => item.id === Number(newLoan.memberId))
     const book = availableBooks.find((item) => item.id === Number(newLoan.bookId))
     const issued = localDate()
     if (!member || !book || !newLoan.dueDate || newLoan.dueDate < issued) return
@@ -355,7 +356,7 @@ export function LoansManagement() {
                   <SelectValue placeholder="Select member" />
                 </SelectTrigger>
                 <SelectContent>
-                  {members.map((member) => (
+                  {borrowingMembers.map((member) => (
                     <SelectItem key={member.id} value={String(member.id)}>
                       {member.name}
                     </SelectItem>
