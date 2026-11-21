@@ -3,7 +3,7 @@
 import { useState } from "react"
 import type { Book } from "@/lib/library/books"
 import { useLibraryCollection, useLibraryRecords } from "@/hooks/use-library"
-import { availableCopies } from "@/lib/library/circulation"
+import { availableCopies, borrowedCopies } from "@/lib/library/circulation"
 import { RecordDetails } from "@/components/admin/record-details"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
 import { nextRecordId } from "@/lib/record-id"
@@ -63,6 +63,7 @@ export function BooksManagement() {
     publishedYear: new Date().getFullYear(),
   })
 
+  const minimumCopies = editingBook ? borrowedCopies(editingBook, loans) : 0
   const isbnSearch = normalizeIsbn(searchTerm)
   const filteredBooks = books.filter((book) => {
     const matchesSearch =
@@ -441,13 +442,17 @@ export function BooksManagement() {
                     id="edit-copies"
                     type="number"
                     required
-                    min={0}
+                    min={minimumCopies}
+                    aria-describedby="edit-copies-help"
                     value={Number.isNaN(editingBook.copies) ? "" : editingBook.copies}
                     onChange={(e) =>
                       setEditingBook({ ...editingBook, copies: e.currentTarget.valueAsNumber })
                     }
                     className="bg-input border-border"
                   />
+                  <p id="edit-copies-help" className="text-xs text-muted-foreground">
+                    {minimumCopies} {minimumCopies === 1 ? "copy is" : "copies are"} currently on loan.
+                  </p>
                 </div>
               </div>
             </form>
