@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { encodeCsv } from "@/lib/report-csv"
 import { Badge } from "@/components/ui/badge"
 import {
   Download,
@@ -99,6 +100,27 @@ const kpiData = [
   },
 ]
 
+const reportCsv = encodeCsv([
+  ["Section", "Item", "Metric", "Value"],
+  ...kpiData.flatMap((kpi) => [
+    ["Summary", kpi.title, "Value", kpi.value],
+    ["Summary", kpi.title, "Change", kpi.change],
+  ]),
+  ...monthlyTrendsData.flatMap((month) => [
+    ["Monthly trends", month.month, "Loans", month.loans],
+    ["Monthly trends", month.month, "Returns", month.returns],
+    ["Monthly trends", month.month, "New members", month.newMembers],
+  ]),
+  ...categoryDistribution.map((item) => ["Catalog", item.name, "Books", item.value]),
+  ...membershipData.map((item) => ["Membership", item.type, "Members", item.count]),
+  ...topBorrowedBooks.map((book) => ["Popular books", book.title, "Borrows", book.borrows]),
+  ...weeklyActivity.flatMap((day) => [
+    ["Weekly activity", day.day, "Visits", day.visits],
+    ["Weekly activity", day.day, "Borrows", day.borrows],
+  ]),
+])
+const reportUrl = `data:text/csv;charset=utf-8,${encodeURIComponent(reportCsv)}`
+
 export function Reports() {
   return (
     <div className="space-y-6">
@@ -109,13 +131,15 @@ export function Reports() {
           <p className="text-muted-foreground">Comprehensive library performance insights</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
-            <Calendar className="h-4 w-4 mr-2" />
-            Last 6 Months
-          </Button>
-          <Button className="bg-primary hover:bg-primary/90">
-            <Download className="h-4 w-4 mr-2" />
-            Export Report
+          <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+            <Calendar className="h-4 w-4" />
+            October to March
+          </span>
+          <Button asChild className="bg-primary hover:bg-primary/90">
+            <a href={reportUrl} download="libraryhub-report.csv">
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+            </a>
           </Button>
         </div>
       </div>
