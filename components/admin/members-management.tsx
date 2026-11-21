@@ -6,6 +6,7 @@ import { useLibraryCollection } from "@/hooks/use-library"
 import { RecordDetails } from "@/components/admin/record-details"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
 import { nextRecordId } from "@/lib/record-id"
+import { localDate } from "@/lib/library/calendar"
 import { memberEmailInUse } from "@/lib/library/email"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -76,7 +77,7 @@ export function MembersManagement() {
       name: newMember.name.trim(),
       email: newMember.email.trim(),
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${newMember.name}`,
-      joinDate: new Date().toISOString().split("T")[0],
+      joinDate: localDate(),
       booksLoaned: 0,
       status: "active",
     }

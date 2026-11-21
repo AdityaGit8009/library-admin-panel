@@ -6,6 +6,7 @@ import { useLibraryCollection, useLibraryRecords } from "@/hooks/use-library"
 import { RecordDetails } from "@/components/admin/record-details"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
 import { nextRecordId } from "@/lib/record-id"
+import { localDate } from "@/lib/library/calendar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -70,14 +71,15 @@ export function LoansManagement() {
   const handleAddLoan = () => {
     const member = members.find((item) => item.id === Number(newLoan.memberId))
     const book = books.find((item) => item.id === Number(newLoan.bookId))
-    if (!member || !book || !newLoan.dueDate) return
+    const issued = localDate()
+    if (!member || !book || !newLoan.dueDate || newLoan.dueDate < issued) return
 
     const loan: Omit<Loan, "id"> = {
       memberId: member.id,
       bookId: book.id,
       member: { name: member.name, email: member.email, avatar: member.avatar },
       book: { title: book.title, author: book.author, isbn: book.isbn },
-      loanDate: new Date().toISOString().split("T")[0],
+      loanDate: issued,
       dueDate: newLoan.dueDate,
       returnDate: null,
       status: "active",
@@ -91,7 +93,7 @@ export function LoansManagement() {
     setLoans(
       loans.map((l) =>
         l.id === loanId
-          ? { ...l, returnDate: new Date().toISOString().split("T")[0], status: "returned" as const }
+          ? { ...l, returnDate: localDate(), status: "returned" as const }
           : l
       )
     )
@@ -384,6 +386,7 @@ export function LoansManagement() {
               <Input
                 id="due-date"
                 type="date"
+                min={localDate()}
                 required
                 value={newLoan.dueDate}
                 onChange={(e) => setNewLoan({ ...newLoan, dueDate: e.target.value })}
