@@ -165,6 +165,9 @@ export function BooksManagement() {
   const handleAddBook = () => {
     const book: Omit<Book, "id"> = {
       ...newBook,
+      title: newBook.title.trim(),
+      author: newBook.author.trim(),
+      isbn: newBook.isbn.trim(),
       status: "available",
     }
     setBooks((current) => [...current, { ...book, id: nextRecordId(current) }])
@@ -181,7 +184,8 @@ export function BooksManagement() {
 
   const handleEditBook = () => {
     if (editingBook) {
-      setBooks(books.map((b) => (b.id === editingBook.id ? editingBook : b)))
+      const book = { ...editingBook, title: editingBook.title.trim(), author: editingBook.author.trim() }
+      setBooks((current) => current.map((existing) => (existing.id === book.id ? book : existing)))
       setEditingBook(null)
     }
   }
@@ -346,11 +350,20 @@ export function BooksManagement() {
           <DialogHeader>
             <DialogTitle className="text-foreground">Add New Book</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <form
+            id="add-book"
+            className="grid gap-4 py-4"
+            onSubmit={(event) => {
+              event.preventDefault()
+              handleAddBook()
+            }}
+          >
             <div className="grid gap-2">
               <Label htmlFor="title">Title</Label>
               <Input
                 id="title"
+                required
+                pattern={".*\\S.*"}
                 value={newBook.title}
                 onChange={(e) => setNewBook({ ...newBook, title: e.target.value })}
                 className="bg-input border-border"
@@ -360,6 +373,8 @@ export function BooksManagement() {
               <Label htmlFor="author">Author</Label>
               <Input
                 id="author"
+                required
+                pattern={".*\\S.*"}
                 value={newBook.author}
                 onChange={(e) => setNewBook({ ...newBook, author: e.target.value })}
                 className="bg-input border-border"
@@ -370,6 +385,8 @@ export function BooksManagement() {
                 <Label htmlFor="isbn">ISBN</Label>
                 <Input
                   id="isbn"
+                  required
+                  pattern={".*\\S.*"}
                   value={newBook.isbn}
                   onChange={(e) => setNewBook({ ...newBook, isbn: e.target.value })}
                   className="bg-input border-border"
@@ -400,8 +417,10 @@ export function BooksManagement() {
                 <Input
                   id="copies"
                   type="number"
-                  value={newBook.copies}
-                  onChange={(e) => setNewBook({ ...newBook, copies: parseInt(e.target.value) })}
+                  required
+                  min={0}
+                  value={Number.isNaN(newBook.copies) ? "" : newBook.copies}
+                  onChange={(e) => setNewBook({ ...newBook, copies: e.currentTarget.valueAsNumber })}
                   className="bg-input border-border"
                 />
               </div>
@@ -410,18 +429,19 @@ export function BooksManagement() {
                 <Input
                   id="year"
                   type="number"
-                  value={newBook.publishedYear}
-                  onChange={(e) => setNewBook({ ...newBook, publishedYear: parseInt(e.target.value) })}
+                  required
+                  value={Number.isNaN(newBook.publishedYear) ? "" : newBook.publishedYear}
+                  onChange={(e) => setNewBook({ ...newBook, publishedYear: e.currentTarget.valueAsNumber })}
                   className="bg-input border-border"
                 />
               </div>
             </div>
-          </div>
+          </form>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleAddBook} className="bg-primary hover:bg-primary/90">
+            <Button type="submit" form="add-book" className="bg-primary hover:bg-primary/90">
               Add Book
             </Button>
           </DialogFooter>
@@ -435,11 +455,20 @@ export function BooksManagement() {
             <DialogTitle className="text-foreground">Edit Book</DialogTitle>
           </DialogHeader>
           {editingBook && (
-            <div className="grid gap-4 py-4">
+            <form
+              id="edit-book"
+              className="grid gap-4 py-4"
+              onSubmit={(event) => {
+                event.preventDefault()
+                handleEditBook()
+              }}
+            >
               <div className="grid gap-2">
                 <Label htmlFor="edit-title">Title</Label>
                 <Input
                   id="edit-title"
+                  required
+                  pattern={".*\\S.*"}
                   value={editingBook.title}
                   onChange={(e) => setEditingBook({ ...editingBook, title: e.target.value })}
                   className="bg-input border-border"
@@ -449,6 +478,8 @@ export function BooksManagement() {
                 <Label htmlFor="edit-author">Author</Label>
                 <Input
                   id="edit-author"
+                  required
+                  pattern={".*\\S.*"}
                   value={editingBook.author}
                   onChange={(e) => setEditingBook({ ...editingBook, author: e.target.value })}
                   className="bg-input border-border"
@@ -478,21 +509,23 @@ export function BooksManagement() {
                   <Input
                     id="edit-copies"
                     type="number"
-                    value={editingBook.copies}
+                    required
+                    min={0}
+                    value={Number.isNaN(editingBook.copies) ? "" : editingBook.copies}
                     onChange={(e) =>
-                      setEditingBook({ ...editingBook, copies: parseInt(e.target.value) })
+                      setEditingBook({ ...editingBook, copies: e.currentTarget.valueAsNumber })
                     }
                     className="bg-input border-border"
                   />
                 </div>
               </div>
-            </div>
+            </form>
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditingBook(null)}>
               Cancel
             </Button>
-            <Button onClick={handleEditBook} className="bg-primary hover:bg-primary/90">
+            <Button type="submit" form="edit-book" className="bg-primary hover:bg-primary/90">
               Save Changes
             </Button>
           </DialogFooter>
