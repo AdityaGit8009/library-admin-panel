@@ -25,3 +25,11 @@ export function loanStatus(loan: Loan, today: string): Loan["status"] {
   if (!isOutstanding(loan)) return "returned"
   return loan.dueDate && loan.dueDate < today ? "overdue" : "active"
 }
+
+export function returnLoan(loans: Loan[], id: number, returnedOn: string) {
+  const index = loans.findIndex((loan) => loan.id === id)
+  if (index < 0 || !isOutstanding(loans[index])) return loans
+  const updated = [...loans]
+  updated[index] = { ...loans[index], status: "returned", returnDate: returnedOn }
+  return updated
+}

@@ -7,7 +7,7 @@ import { RecordDetails } from "@/components/admin/record-details"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
 import { nextRecordId } from "@/lib/record-id"
 import { localDate } from "@/lib/library/calendar"
-import { availableCopies, loanStatus } from "@/lib/library/circulation"
+import { availableCopies, loanStatus, returnLoan } from "@/lib/library/circulation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -95,13 +95,7 @@ export function LoansManagement() {
   }
 
   const handleReturnBook = (loanId: number) => {
-    setLoans(
-      loans.map((l) =>
-        l.id === loanId
-          ? { ...l, returnDate: localDate(), status: "returned" as const }
-          : l
-      )
-    )
+    setLoans((current) => returnLoan(current, loanId, localDate()))
   }
 
   const getStatusColor = (status: string) => {
