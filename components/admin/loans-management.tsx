@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { MemberAvatar } from "@/components/admin/member-avatar"
 import {
   Search,
   Plus,
@@ -255,10 +255,7 @@ export function LoansManagement() {
                   >
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage src={loan.member.avatar} alt={loan.member.name} />
-                          <AvatarFallback>{loan.member.name[0]}</AvatarFallback>
-                        </Avatar>
+                        <MemberAvatar src={loan.member.avatar} name={loan.member.name} />
                         <div>
                           <p className="font-medium text-foreground">{loan.member.name}</p>
                           <p className="text-xs text-muted-foreground">{loan.member.email}</p>

@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { MemberAvatar } from "@/components/admin/member-avatar"
 import {
   Search,
   MoreHorizontal,
@@ -78,7 +78,7 @@ export function MembersManagement() {
       ...newMember,
       name: newMember.name.trim(),
       email: newMember.email.trim(),
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${newMember.name}`,
+      avatar: "",
       joinDate: localDate(),
       status: "active",
     }
@@ -256,10 +256,7 @@ export function MembersManagement() {
                   >
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage src={member.avatar} alt={member.name} />
-                          <AvatarFallback>{member.name[0]}</AvatarFallback>
-                        </Avatar>
+                        <MemberAvatar src={member.avatar} name={member.name} />
                         <div>
                           <p className="font-medium text-foreground">{member.name}</p>
                           <p className="text-xs text-muted-foreground">Joined {member.joinDate}</p>
