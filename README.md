@@ -1,17 +1,19 @@
 # LibraryHub Admin Panel
 
-LibraryHub is an interactive library administration demo built with Next.js, React, and TypeScript. A librarian can look up a title by ISBN, update a member's details, or record a book return. Each management screen starts with sample records and keeps edits in memory until you leave the screen or reload the page. Dashboard figures and report charts use their own sample data.
+LibraryHub is an interactive library administration demo built with Next.js, React, and TypeScript. A librarian can look up a title by ISBN, update a member's details, or record a book return. The catalog, member directory, and circulation desk share one set of records. Changes stay in the current browser tab's session across navigation and reloads. The demo starts with sample records and runs without an account or database.
 
 ## Explore the panel
 
 | Screen | What you can try |
 | --- | --- |
-| Dashboard | Review circulation totals, monthly loan activity, recent loans, and overdue titles. |
-| Books | Search by title, author, or ISBN. Filter by category or status and add, edit, or delete catalog records. |
-| Members | Search by name or email, filter by status, and add or update membership details. |
-| Loans | Create a loan from the sample member and book lists, set a due date, filter by status, and mark a book as returned. |
-| Reports | Explore monthly loans and returns, membership types, and the most borrowed books. |
-| Settings | Try out library contact details, loan policies, and notification preferences. |
+| Dashboard | Review current catalog and circulation counts, recent checkouts, and overdue titles. The monthly activity chart illustrates a sample period. |
+| Books | Search by title, author, or ISBN, inspect record details, and compare available copies with total stock. New titles require a unique ISBN-10 or ISBN-13. |
+| Members | Search by name or email, inspect a profile and its outstanding loans, or update contact details and membership status. Each member has a unique email address. |
+| Loans | Issue an available title to an active member, set a due date, inspect the checkout record, and mark a copy as returned. |
+| Reports | Explore sample monthly trends, membership types, and popular titles. Download the displayed report data as a CSV. |
+| Settings | Preview library contact details, loan policies, and notification preferences. These fields use screen-local state. |
+
+To follow a checkout through the system, note a title's available stock in Books, issue it from Loans, and look up the borrower in Members. Returning that loan restores the available copy and reduces the member's balance. Outstanding loans prevent deletion of the associated book or member.
 
 ## Run locally
 
@@ -30,14 +32,16 @@ Open the dashboard at [localhost:3000](http://localhost:3000). The development s
 | --- | --- |
 | `npm run lint` | Run ESLint across the project. |
 | `npm run typecheck` | Check TypeScript without producing a build. |
-| `npm test` | Run regression tests for pagination and record IDs. |
+| `npm test` | Run the Node regression suite for circulation, validation, storage, pagination, and exports. |
 | `npm run build` | Create a production build in `.next/`. |
 | `npm start` | Serve the production build locally after building it. |
 
 ## Source layout
 
 - `app/page.tsx` switches between the six screens and manages the mobile menu.
-- `components/admin/` contains the screens, their sample records, and the shared table pagination.
+- `components/admin/` contains the screens, record dialogs, and shared table pagination.
+- `lib/library/` contains the sample records, session schema, and rules for borrowing and returns.
+- `hooks/use-library.ts` shares records between screens and persists them in browser session storage.
 - `components/ui/` contains reusable controls, including the dialogs, tables, and charts.
 - `app/globals.css` defines the Tailwind theme and global styles.
 
