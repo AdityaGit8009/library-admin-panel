@@ -149,6 +149,8 @@ export function MembersManagement() {
   const handleAddMember = () => {
     const member: Omit<Member, "id"> = {
       ...newMember,
+      name: newMember.name.trim(),
+      email: newMember.email.trim(),
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${newMember.name}`,
       joinDate: new Date().toISOString().split("T")[0],
       booksLoaned: 0,
@@ -161,7 +163,8 @@ export function MembersManagement() {
 
   const handleEditMember = () => {
     if (editingMember) {
-      setMembers(members.map((m) => (m.id === editingMember.id ? editingMember : m)))
+      const member = { ...editingMember, name: editingMember.name.trim(), email: editingMember.email.trim() }
+      setMembers((current) => current.map((existing) => (existing.id === member.id ? member : existing)))
       setEditingMember(null)
     }
   }
@@ -400,11 +403,20 @@ export function MembersManagement() {
           <DialogHeader>
             <DialogTitle className="text-foreground">Add New Member</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <form
+            id="add-member"
+            className="grid gap-4 py-4"
+            onSubmit={(event) => {
+              event.preventDefault()
+              handleAddMember()
+            }}
+          >
             <div className="grid gap-2">
               <Label htmlFor="name">Full Name</Label>
               <Input
                 id="name"
+                required
+                pattern={".*\\S.*"}
                 value={newMember.name}
                 onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
                 className="bg-input border-border"
@@ -414,6 +426,7 @@ export function MembersManagement() {
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
+                required
                 type="email"
                 value={newMember.email}
                 onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
@@ -447,12 +460,12 @@ export function MembersManagement() {
                 </SelectContent>
               </Select>
             </div>
-          </div>
+          </form>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleAddMember} className="bg-primary hover:bg-primary/90">
+            <Button type="submit" form="add-member" className="bg-primary hover:bg-primary/90">
               Add Member
             </Button>
           </DialogFooter>
@@ -466,11 +479,20 @@ export function MembersManagement() {
             <DialogTitle className="text-foreground">Edit Member</DialogTitle>
           </DialogHeader>
           {editingMember && (
-            <div className="grid gap-4 py-4">
+            <form
+              id="edit-member"
+              className="grid gap-4 py-4"
+              onSubmit={(event) => {
+                event.preventDefault()
+                handleEditMember()
+              }}
+            >
               <div className="grid gap-2">
                 <Label htmlFor="edit-name">Full Name</Label>
                 <Input
                   id="edit-name"
+                  required
+                  pattern={".*\\S.*"}
                   value={editingMember.name}
                   onChange={(e) => setEditingMember({ ...editingMember, name: e.target.value })}
                   className="bg-input border-border"
@@ -480,6 +502,7 @@ export function MembersManagement() {
                 <Label htmlFor="edit-email">Email</Label>
                 <Input
                   id="edit-email"
+                  required
                   type="email"
                   value={editingMember.email}
                   onChange={(e) => setEditingMember({ ...editingMember, email: e.target.value })}
@@ -524,13 +547,13 @@ export function MembersManagement() {
                   </Select>
                 </div>
               </div>
-            </div>
+            </form>
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditingMember(null)}>
               Cancel
             </Button>
-            <Button onClick={handleEditMember} className="bg-primary hover:bg-primary/90">
+            <Button type="submit" form="edit-member" className="bg-primary hover:bg-primary/90">
               Save Changes
             </Button>
           </DialogFooter>
