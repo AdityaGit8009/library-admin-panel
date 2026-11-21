@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { initialBooks, type Book } from "@/lib/library/books"
+import { RecordDetails } from "@/components/admin/record-details"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
 import { nextRecordId } from "@/lib/record-id"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -39,102 +41,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-interface Book {
-  id: number
-  title: string
-  author: string
-  isbn: string
-  category: string
-  status: "available" | "borrowed" | "reserved"
-  copies: number
-  publishedYear: number
-}
-
-const initialBooks: Book[] = [
-  {
-    id: 1,
-    title: "The Great Gatsby",
-    author: "F. Scott Fitzgerald",
-    isbn: "978-0743273565",
-    category: "Fiction",
-    status: "available",
-    copies: 5,
-    publishedYear: 1925,
-  },
-  {
-    id: 2,
-    title: "1984",
-    author: "George Orwell",
-    isbn: "978-0451524935",
-    category: "Fiction",
-    status: "borrowed",
-    copies: 3,
-    publishedYear: 1949,
-  },
-  {
-    id: 3,
-    title: "To Kill a Mockingbird",
-    author: "Harper Lee",
-    isbn: "978-0446310789",
-    category: "Fiction",
-    status: "available",
-    copies: 7,
-    publishedYear: 1960,
-  },
-  {
-    id: 4,
-    title: "A Brief History of Time",
-    author: "Stephen Hawking",
-    isbn: "978-0553380163",
-    category: "Science",
-    status: "reserved",
-    copies: 2,
-    publishedYear: 1988,
-  },
-  {
-    id: 5,
-    title: "The Art of War",
-    author: "Sun Tzu",
-    isbn: "978-1599869773",
-    category: "History",
-    status: "available",
-    copies: 4,
-    publishedYear: -500,
-  },
-  {
-    id: 6,
-    title: "Pride and Prejudice",
-    author: "Jane Austen",
-    isbn: "978-0141439518",
-    category: "Fiction",
-    status: "borrowed",
-    copies: 6,
-    publishedYear: 1813,
-  },
-  {
-    id: 7,
-    title: "The Origin of Species",
-    author: "Charles Darwin",
-    isbn: "978-0451529060",
-    category: "Science",
-    status: "available",
-    copies: 3,
-    publishedYear: 1859,
-  },
-  {
-    id: 8,
-    title: "Crime and Punishment",
-    author: "Fyodor Dostoevsky",
-    isbn: "978-0143107637",
-    category: "Fiction",
-    status: "available",
-    copies: 4,
-    publishedYear: 1866,
-  },
-]
-
 export function BooksManagement() {
   const [books, setBooks] = useState<Book[]>(initialBooks)
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -311,12 +220,12 @@ export function BooksManagement() {
                     <td className="py-3 px-4 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
+                          <Button variant="ghost" size="icon" aria-label={`Actions for ${book.title}`}>
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setSelectedBook(book)}>
                             <Eye className="h-4 w-4 mr-2" />
                             View Details
                           </DropdownMenuItem>
@@ -343,6 +252,17 @@ export function BooksManagement() {
           <TablePagination {...pagination} itemLabel="books" />
         </CardContent>
       </Card>
+
+      {selectedBook && (
+        <RecordDetails
+          title={selectedBook.title}
+          fields={{
+              Author: selectedBook.author, ISBN: selectedBook.isbn, Category: selectedBook.category,
+              Status: selectedBook.status, Copies: selectedBook.copies, "Published year": selectedBook.publishedYear,
+          }}
+          onClose={() => setSelectedBook(null)}
+        />
+      )}
 
       {/* Add Book Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
