@@ -7,7 +7,7 @@ import { RecordDetails } from "@/components/admin/record-details"
 import { TablePagination, useTablePagination } from "@/components/admin/table-pagination"
 import { nextRecordId } from "@/lib/record-id"
 import { localDate } from "@/lib/library/calendar"
-import { availableCopies } from "@/lib/library/circulation"
+import { availableCopies, loanStatus } from "@/lib/library/circulation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -46,7 +46,9 @@ import {
 } from "@/components/ui/select"
 
 export function LoansManagement() {
-  const [loans, setLoans] = useLibraryCollection("loans")
+  const [storedLoans, setLoans] = useLibraryCollection("loans")
+  const today = localDate()
+  const loans = storedLoans.map((loan) => ({ ...loan, status: loanStatus(loan, today) }))
   const { members, books } = useLibraryRecords()
   const borrowingMembers = members.filter((member) => member.status === "active")
   const availableBooks = books.filter((book) => book.status !== "reserved" && availableCopies(book, loans) > 0)

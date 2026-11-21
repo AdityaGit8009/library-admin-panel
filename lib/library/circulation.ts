@@ -20,3 +20,8 @@ export function memberLoans(member: Member, loans: readonly Loan[]) {
     loan.memberId !== undefined ? loan.memberId === member.id : loan.member.email.toLowerCase() === member.email.toLowerCase()
   )).length
 }
+
+export function loanStatus(loan: Loan, today: string): Loan["status"] {
+  if (!isOutstanding(loan)) return "returned"
+  return loan.dueDate && loan.dueDate < today ? "overdue" : "active"
+}

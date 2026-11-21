@@ -1,6 +1,6 @@
 import assert from "node:assert/strict"
 import test from "node:test"
-import { availableCopies, borrowedCopies, memberLoans } from "../lib/library/circulation.ts"
+import { availableCopies, borrowedCopies, loanStatus, memberLoans } from "../lib/library/circulation.ts"
 
 const book = { id: 4, isbn: "978-0-306-40615-7", copies: 2 }
 const open = { book: { isbn: "9780306406157" }, returnDate: null, status: "active" }
@@ -17,4 +17,11 @@ test("member balances follow current and legacy outstanding loans", () => {
   const legacy = { ...open, member: { email: "NEW@example.test" } }
   const previousEmail = { ...legacy, memberId: 2, member: { email: "old@example.test" } }
   assert.equal(memberLoans(member, [legacy, previousEmail, { ...legacy, memberId: 8 }, { ...legacy, status: "returned" }]), 2)
+})
+
+test("a due date remains current through the day and returned loans stay closed", () => {
+  const loan = { ...open, dueDate: "2026-10-20" }
+  assert.equal(loanStatus(loan, "2026-10-20"), "active")
+  assert.equal(loanStatus(loan, "2026-10-21"), "overdue")
+  assert.equal(loanStatus({ ...loan, returnDate: "2026-10-19" }, "2026-10-21"), "returned")
 })
